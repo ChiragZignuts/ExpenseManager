@@ -1,0 +1,405 @@
+{
+	"info": {
+		"_postman_id": "422dd213-87dc-48e3-baaf-c30c2accf0c5",
+		"name": "Expense Manager",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"chirag@gmail.com\",\n    \"password\": \"test@123\",\n    \"fname\": \"Chirag\",\n    \"lname\": \"Tolat\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/signup",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/signin",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"chirag@gmail.com\",\n    \"password\": \"test@123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/signin",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"signin"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/user/accounts",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/:id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/user/accounts/622214aa2b83f41b81b41aa2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"622214aa2b83f41b81b41aa2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/addAccount",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accName\": \"Goa Trip\"   \n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/addAccount",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"addAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/updateAccount/:id",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"accName\": \"Manali Trip\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/updateAccount/621da5faf1e25803ae96bb56",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"updateAccount",
+						"621da5faf1e25803ae96bb56"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/deleteAccount/:id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/user/deleteAccount/621da5faf1e25803ae96bb56",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"deleteAccount",
+						"621da5faf1e25803ae96bb56"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/addMember/:id",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\":\"jainam@gmail.com\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/accounts/addMember/622214aa2b83f41b81b41aa2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"addMember",
+						"622214aa2b83f41b81b41aa2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/removeMember/:id",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/user/accounts/removeMember/",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"removeMember",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/addTransaction/:id",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"transDate\" : \"2020-05-15\",\n    \"transName\":\"Cash Out\",\n    \"amount\":\"3000\",\n    \"type\":\"expense\",\n    \"description\": \"Baga Beach\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/accounts/addTransaction/622214aa2b83f41b81b41aa2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"addTransaction",
+						"622214aa2b83f41b81b41aa2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/transactions/:id",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/user/accounts/transactions/622214aa2b83f41b81b41aa2",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"transactions",
+						"622214aa2b83f41b81b41aa2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/updateTransaction/:id",
+			"request": {
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\n    {\n        \"propName\": \"amount\",\n        \"value\": \"2000\"\n    },\n    {\n        \"propName\": \"type\",\n        \"value\": \"income\"\n    }\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/user/accounts/updateTransaction/622216502b83f41b81b41aaa",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"updateTransaction",
+						"622216502b83f41b81b41aaa"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/user/accounts/deleteTransaction/:id",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Barer {{token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/user/accounts/deleteTransaction/622216502b83f41b81b41aaa",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"user",
+						"accounts",
+						"deleteTransaction",
+						"622216502b83f41b81b41aaa"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
