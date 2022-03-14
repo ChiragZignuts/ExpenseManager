@@ -4,257 +4,224 @@
  * @description :: Server-side actions for handling incoming requests.
  * @help        :: See https://sailsjs.com/docs/concepts/actions
  */
-require('../models/Account');
+
+const msg = sails.config.messages.Account;
+const resCode = sails.config.constants.responseCode;
 
 // Get All Accounts of Signin user
-GetAllAccounts = (req, res) => {
-  Account.find({ owner: req.userData.userId })
-    .then((accounts) => {
-      res.status(200).json(accounts);
-    })
-    .catch((err) => {
-      return res.status(500).json({
-        error: err,
-      });
+getAllAccounts = async (req, res) => {
+  try {
+    // find all accounts where user is owner
+    let owner = await Account.find({ owner: req.userData.userId });
+
+    // find all accounts where user is member
+    let member = await UserAccount.find({
+      where: { member: req.userData.userId },
+      select: ['account'],
+    }).populate('account');
+
+    return res.status(resCode.OK).json({
+      owner,
+      member,
     });
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
+    });
+  }
 };
 
-GetAccountDetails = (req, res) => {
-  accId = req.params.id;
-  Account.findOne({ id: accId })
-    .populate('owner')
-    .populate('members')
-    .populate('transactions')
-    .then((account) => {
-      res.status(200).json({
-        account,
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err.message,
-      });
+getAccountDetails = async (req, res) => {
+  try {
+    accId = req.params.id;
+
+    // find account details by account id
+    let account = await Account.findOne({ id: accId })
+      .populate('owner')
+      .populate('members', { select: ['email'] });
+
+    return res.status(resCode.OK).json({
+      account,
     });
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
+    });
+  }
 };
 
-CreateAccount = (req, res) => {
-  Account.create({
-    accName: req.body.accName,
-    balance: req.body.balance,
-    owner: req.userData.userId,
-  })
-    .fetch()
-    .then((result) => {
-      console.log(result);
-      res.status(201).json({
-        message: 'Account Created',
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err,
-      });
+createAccount = async (req, res) => {
+  try {
+    // create account
+    await Account.create({
+      accName: req.body.accName,
+      balance: req.body.balance,
+      owner: req.userData.userId,
     });
+
+    return res.status(resCode.OK).json({
+      message: msg.AccountCreated,
+    });
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
+    });
+  }
 };
 
-UpdateAccount = (req, res) => {
-  const accId = req.params.id;
-  Account.findOne({ id: accId })
-    .then((result) => {
-      if (req.userData.userId === result.owner) {
-        Account.updateOne({ id: accId })
-          .set({
-            accName: req.body.accName,
-          })
-          .then((result) => {
-            console.log(result);
-            res.status(200).json({
-              message: 'Account Name Updated Successfully!',
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({
-              error: err.message,
-            });
+updateAccount = async (req, res) => {
+  try {
+    const accId = req.params.id;
+
+    // update account with account id
+    await Account.updateOne({ id: accId }).set({
+      accName: req.body.accName,
+    });
+
+    return res.status(resCode.OK).json({
+      message: msg.AccountUpdated,
+    });
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
+    });
+  }
+};
+
+deleteAccount = async (req, res) => {
+  try {
+    const accId = req.params.id;
+
+    // delete transaction of the account with account id
+    await Transaction.destroy({ accountId: accId });
+
+    // delete account with account id
+    await Account.destroy({ id: accId });
+
+    return res.status(resCode.OK).json({
+      message: msg.AccountDeleted,
+    });
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
+    });
+  }
+};
+
+addMember = async (req, res) => {
+  try {
+    const accId = req.params.id;
+
+    // find account with account id
+    let account = await Account.findOne({ id: accId });
+
+    // find user with email id
+    let user = await User.findOne({ email: req.body.email });
+
+    if (user) {
+      // if user found check for user is owner of that account or not
+      if (user.id !== account.owner) {
+        // if user is not owner check if user is already in the account or not
+
+        // find user as a member of an account
+        let member = await UserAccount.findOne({
+          member: user.id,
+          account: account.id,
+        });
+
+        if (!member) {
+          // if user is not a member then add it as a member
+          await Account.addToCollection(accId, 'members').members([user.id]);
+
+          return res.status(resCode.OK).json({
+            message: msg.MemberAdded,
           });
+        } else {
+          // if user is already a member return duplicate member
+          return res.status(resCode.BAD_REQUEST).json({
+            message: msg.DuplicateMember,
+          });
+        }
       } else {
-        res.status(403).json({
-          message: 'Access Denied',
+        // if user is owner then return owner cannot be a member
+        return res.status(resCode.BAD_REQUEST).json({
+          message: msg.OwnerCannotMember,
         });
       }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err,
+    } else {
+      // return if email is not exist
+      return res.status(resCode.BAD_REQUEST).json({
+        message: msg.NoEmailFound,
       });
+    }
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
     });
+  }
 };
 
-DeleteAccount = (req, res) => {
-  const accId = req.params.id;
-  Account.findOne({ id: accId })
-    .then((result) => {
-      if (req.userData.userId === result.owner) {
-        Transaction.destroy({ accountId: accId })
-          .then(() => {
-            Account.destroy({ id: accId })
-              .fetch()
-              .then(() => {
-                res.status(200).json({
-                  message: 'Account Deleted',
-                });
-              })
-              .catch((err) => {
-                res.status(200).json({
-                  error: err.message,
-                });
-              });
-          })
-          .catch((err) => {
-            res.status(500).json({ error: err.message });
+removeMember = async (req, res) => {
+  try {
+    const accId = req.params.id;
+
+    // find account with account id
+    let account = await Account.findOne({ id: accId });
+
+    // find user with email id
+    let user = await User.findOne({ email: req.body.email });
+
+    if (user) {
+      // if user found check for user is owner of that account or not
+      if (user.id !== account.owner) {
+        // if user is not owner check if user is already in the account or not
+
+        // find user as a member of an account
+        let member = await UserAccount.findOne({
+          member: user.id,
+          account: account.id,
+        });
+
+        if (member) {
+          // if user is a member then remove it as a member
+          await Account.removeFromCollection(accId, 'members').members([
+            user.id,
+          ]);
+
+          return res.status(resCode.OK).json({
+            message: msg.MemberRemoved,
           });
+        } else {
+          // if user is not a member then return not a member
+          return res.status(resCode.BAD_REQUEST).json({
+            message: msg.NotAMember,
+          });
+        }
       } else {
-        res.status(403).json({
-          message: 'Access Denied',
+        // if user is owner then return owner cannot removed
+        return res.status(resCode.BAD_REQUEST).json({
+          message: msg.OwnerCannotRemoved,
         });
       }
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err.message,
+    } else {
+      // return if email is not exist
+      return res.status(resCode.BAD_REQUEST).json({
+        message: msg.NoEmailFound,
       });
+    }
+  } catch (error) {
+    return res.status(resCode.SERVER_ERROR).json({
+      error: error.message,
     });
-};
-
-AddMember = (req, res) => {
-  const accId = req.params.id;
-  Account.findOne({ id: accId })
-    .then((account) => {
-      // console.log('account', account);
-      User.findOne({ email: req.body.email })
-        .then((record) => {
-          // console.log('record', record);
-          if (record) {
-            if (record.id !== account.owner) {
-              UserAccount.find({ member: record.id, account: account.id })
-                .then((member) => {
-                  // console.log('member', member.length);
-                  if (member.length === 0) {
-                    Account.addToCollection(accId, 'members')
-                      .members([record.id])
-                      .then(() => {
-                        res.status(200).json({
-                          message: 'New Member added',
-                        });
-                      })
-                      .catch((err) => {
-                        res.status(500).json({
-                          error: err.message,
-                        });
-                      });
-                  } else {
-                    res.status(400).json({
-                      message: 'Member already added',
-                    });
-                  }
-                })
-                .catch((err) => {
-                  res.status(500).json({
-                    error: err.message,
-                  });
-                });
-            } else {
-              return res.status(400).json({
-                message: 'Owner cannot be a member',
-              });
-            }
-          } else {
-            return res.status(400).json({
-              message: 'Email is not exist',
-            });
-          }
-        })
-        .catch((err) => {
-          res.status(500).json({
-            error: err.message,
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err.message,
-      });
-    });
-};
-
-RemoveMember = (req, res) => {
-  const accId = req.params.id;
-
-  Account.findOne({ id: accId })
-    .then((account) => {
-      // console.log('account', account);
-      User.findOne({ email: req.body.email })
-        .then((record) => {
-          // console.log('record', record);
-          if (record) {
-            if (record.id !== account.owner) {
-              UserAccount.find({ member: record.id, account: account.id })
-                .then((member) => {
-                  // console.log('member', member.length);
-                  if (member.length !== 0) {
-                    Account.removeFromCollection(accId, 'members')
-                      .members([record.id])
-                      .then(() => {
-                        res.status(200).json({
-                          message: 'Member removed',
-                        });
-                      })
-                      .catch((err) => {
-                        res.status(500).json({
-                          error: err.message,
-                        });
-                      });
-                  } else {
-                    res.status(400).json({
-                      message: 'No member found',
-                    });
-                  }
-                })
-                .catch((err) => {
-                  res.status(500).json({
-                    error: err.message,
-                  });
-                });
-            } else {
-              return res.status(400).json({
-                message: 'Owner cannot removed',
-              });
-            }
-          } else {
-            return res.status(400).json({
-              message: 'Email is not exist',
-            });
-          }
-        })
-        .catch((err) => {
-          res.status(500).json({
-            error: err.message,
-          });
-        });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        error: err.message,
-      });
-    });
+  }
 };
 
 module.exports = {
-  GetAllAccounts,
-  GetAccountDetails,
-  CreateAccount,
-  UpdateAccount,
-  DeleteAccount,
-  AddMember,
-  RemoveMember,
+  getAllAccounts,
+  getAccountDetails,
+  createAccount,
+  updateAccount,
+  deleteAccount,
+  addMember,
+  removeMember,
 };

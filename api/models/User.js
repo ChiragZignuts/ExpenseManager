@@ -7,10 +7,6 @@
 
 module.exports = {
   attributes: {
-    //  ╔═╗╦═╗╦╔╦╗╦╔╦╗╦╦  ╦╔═╗╔═╗
-    //  ╠═╝╠╦╝║║║║║ ║ ║╚╗╔╝║╣ ╚═╗
-    //  ╩  ╩╚═╩╩ ╩╩ ╩ ╩ ╚╝ ╚═╝╚═╝
-
     email: {
       type: 'string',
       required: true,
@@ -28,14 +24,16 @@ module.exports = {
       type: 'string',
       required: true,
     },
+    token: {
+      type: 'string',
+      allowNull: true,
+    },
 
-    //  ╔═╗╔╦╗╔╗ ╔═╗╔╦╗╔═╗
-    //  ║╣ ║║║╠╩╗║╣  ║║╚═╗
-    //  ╚═╝╩ ╩╚═╝╚═╝═╩╝╚═╝
-
-    //  ╔═╗╔═╗╔═╗╔═╗╔═╗╦╔═╗╔╦╗╦╔═╗╔╗╔╔═╗
-    //  ╠═╣╚═╗╚═╗║ ║║  ║╠═╣ ║ ║║ ║║║║╚═╗
-    //  ╩ ╩╚═╝╚═╝╚═╝╚═╝╩╩ ╩ ╩ ╩╚═╝╝╚╝╚═╝
+    // associations
+    account: {
+      collection: 'account',
+      via: 'owner',
+    },
     accounts: {
       collection: 'account',
       via: 'member',
@@ -47,6 +45,11 @@ module.exports = {
     },
   },
 
+  // not display selected fields
+  customToJSON: function () {
+    return _.omit(this, ['createdAt', 'updatedAt', 'password', 'token']);
+  },
+
   afterCreate: async function (user, proceed) {
     try {
       // Sending SignUp Email
@@ -56,16 +59,14 @@ module.exports = {
       });
 
       // Creating Default Account
-      Account.create({
+      await Account.create({
         accName: user.fname + `'s Account`,
         owner: user.id,
-      })
-        .fetch()
-        .then((result) => {
-          console.log(result);
-        });
-    } catch (err) {
-      console.log(err);
+      });
+    } catch (error) {
+      return res.status(resCode.SERVER_ERROR).json({
+        error: error.message,
+      });
     }
     proceed();
   },

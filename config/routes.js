@@ -9,24 +9,25 @@
  */
 
 module.exports.routes = {
-  'POST /signup': 'UserController.UserSignUp',
-  'POST /signin': 'UserController.UserSignIn',
+  'POST /signup': 'UserController.userSignUp',
+  'POST /signin': 'UserController.userSignIn',
+  'POST /logout': 'UserController.userLogout',
 
-  'GET /user/accounts': 'AccountController.GetAllAccounts',
-  'GET /user/accounts/:id': 'AccountController.GetAccountDetails',
-  'POST /user/addAccount': 'AccountController.CreateAccount',
-  'PATCH /user/updateAccount/:id': 'AccountController.UpdateAccount',
-  'DELETE /user/deleteAccount/:id': 'AccountController.DeleteAccount',
+  'GET /user/accounts': 'AccountController.getAllAccounts',
+  'GET /user/accounts/:id': 'AccountController.getAccountDetails',
+  'POST /user/addAccount': 'AccountController.createAccount',
+  'PATCH /user/updateAccount/:id': 'AccountController.updateAccount',
+  'DELETE /user/deleteAccount/:id': 'AccountController.deleteAccount',
 
-  'POST /user/accounts/addMember/:id': 'AccountController.AddMember',
-  'POST /user/accounts/removeMember/:id': 'AccountController.RemoveMember',
+  'POST /user/accounts/addMember/:id': 'AccountController.addMember',
+  'POST /user/accounts/removeMember/:id': 'AccountController.removeMember',
 
   'POST /user/accounts/addTransaction/:id':
-    'TransactionController.AddTransaction',
+    'TransactionController.addTransaction',
   'GET /user/accounts/transactions/:id':
-    'TransactionController.GetTransactions',
+    'TransactionController.getTransactions',
   'PATCH /user/accounts/updateTransaction/:id':
-    'TransactionController.UpdateTransaction',
+    'TransactionController.updateTransaction',
   'DELETE /user/accounts/deleteTransaction/:id':
-    'TransactionController.DeleteTransaction',
+    'TransactionController.deleteTransaction',
 };

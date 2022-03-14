@@ -18,10 +18,22 @@ module.exports.policies = {
 
   // '*': true,
 
+  UserController: {
+    userLogout: 'isLoggedIn',
+  },
   AccountController: {
+    getAccountDetails: ['isLoggedIn', 'isOwnerOrMember'],
+    updateAccount: ['isLoggedIn', 'isOwner'],
+    deleteAccount: ['isLoggedIn', 'isOwner'],
+    addMember: ['isLoggedIn', 'isOwner'],
+    removeMember: ['isLoggedIn', 'isOwner'],
     '*': 'isLoggedIn',
   },
   TransactionController: {
+    addTransaction: ['isLoggedIn', 'isOwnerOrMember'],
+    getTransactions: ['isLoggedIn', 'isOwnerOrMember'],
+    updateTransaction: ['isLoggedIn', 'isTransaction'],
+    deleteTransaction: ['isLoggedIn', 'isTransaction'],
     '*': 'isLoggedIn',
   },
 };

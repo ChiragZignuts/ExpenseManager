@@ -22,6 +22,7 @@ module.exports = {
     },
   },
 
+  // set host and port
   fn: async function (inputs) {
     var transport = nodemailer.createTransport({
       host: 'smtp.mailtrap.io',
@@ -32,6 +33,7 @@ module.exports = {
       },
     });
 
+    // set details to send
     var data = {
       from: 'expensemanager@gmail.com',
       to: inputs.to,
@@ -40,13 +42,12 @@ module.exports = {
         '<h3>Hello ' + inputs.fname + ',</h3> <br>Welcome to Expense Manager.',
     };
 
-    console.log(data);
-
-    transport.sendMail(data, (err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Email sent');
+    // sending email
+    transport.sendMail(data, (error) => {
+      if (error) {
+        return res.status(resCode.SERVER_ERROR).json({
+          error: error.message,
+        });
       }
     });
   },
